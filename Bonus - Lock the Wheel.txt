@@ -1,0 +1,71 @@
+#By Mali61 / Blackdragonx61
+#Intrologin.py:
+#Find
+
+		app.SetCamera(map_random['dis'], map_random['pit'], map_random['rot'], map_random['height'])
+
+#Add
+
+		app.LockMouseWheel(True)
+
+#Find
+
+			background.Destroy()
+
+#Add
+
+			app.LockMouseWheel(False)
+
+//PythonApplication.h
+//Find
+
+		void SetMouseHandler(PyObject * poMouseHandler);
+
+///Add
+
+		void LockMouseWheel(bool bLock) { m_bLockMouseWheel = bLock; }
+
+//Find
+
+		bool						m_isFrameSkipDisable;
+
+///Add
+
+		bool						m_bLockMouseWheel;
+
+//PythonApplication.cpp
+//Find
+
+m_isFrameSkipDisable(false),
+
+///Add
+
+m_bLockMouseWheel(false),
+
+//PythonApplication.cpp
+
+///Change : void CPythonApplication::OnMouseWheel(int nLen)
+void CPythonApplication::OnMouseWheel(int nLen)
+{
+	if (m_bLockMouseWheel)
+		return;
+
+	CCameraManager& rkCmrMgr=CCameraManager::Instance();
+	CCamera* pkCmrCur=rkCmrMgr.GetCurrentCamera();
+	if (pkCmrCur)
+		pkCmrCur->Wheel(nLen);
+}
+
+//PythonApplicationModule.cpp
+
+PyObject* appLockMouseWheel(PyObject* poSelf, PyObject* poArgs)
+{
+	bool bLock;
+	if (!PyTuple_GetBoolean(poArgs, 0, &bLock))
+		return Py_BuildException();
+
+	CPythonApplication::Instance().LockMouseWheel(bLock);
+	return Py_BuildNone();
+}
+
+		{ "LockMouseWheel",				appLockMouseWheel,				METH_VARARGS },
